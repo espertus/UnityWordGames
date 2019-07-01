@@ -89,6 +89,9 @@
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanPanel.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanPuzzleData.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanWordScorer.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoDictionary.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoGameEvents.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoTile.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\Scramble.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\ScrambleDictionary.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\ScrambleGameEvents.cs" />
@@ -325,9 +328,6 @@
     <Reference Include="nunit.framework">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.8f1/Unity.app/Contents/UnityExtensions/Unity/TestRunner/net35/unity-custom/nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="UnityEngine.Advertisements">
-      <HintPath>/Users/spertus/src/UnityWordGames/Library/PackageCache/com.unity.ads@2.0.8/UnityEngine.Advertisements.dll</HintPath>
-    </Reference>
     <Reference Include="Unity.Analytics.Editor">
       <HintPath>/Users/spertus/src/UnityWordGames/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Editor.dll</HintPath>
     </Reference>
@@ -336,9 +336,6 @@
     </Reference>
     <Reference Include="Unity.Analytics.Tracker">
       <HintPath>/Users/spertus/src/UnityWordGames/Library/PackageCache/com.unity.analytics@3.3.2/Unity.Analytics.Tracker.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.Purchasing">
-      <HintPath>/Users/spertus/src/UnityWordGames/Library/PackageCache/com.unity.purchasing@2.0.6/UnityEngine.Purchasing.dll</HintPath>
     </Reference>
     <Reference Include="netstandard">
       <HintPath>/Applications/Unity/Hub/Editor/2019.1.8f1/Unity.app/Contents/NetStandard/ref/2.0.0/netstandard.dll</HintPath>
