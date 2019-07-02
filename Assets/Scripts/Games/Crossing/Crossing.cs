@@ -179,7 +179,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 				selectedTile.transform.localScale = panelGrid.transform.localScale;
 				selectedTile.transform.parent = wordGrid.transform;
 				selectedTile.transform.localPosition = tile.transform.localPosition;
-				selectedTile.gridType = CrossingTile.GRID_TYPE.WORD_GRID;
+				selectedTile.gridType = CrossingGrid.GRID_TYPE.WORD_GRID;
 				selectedTile.SetTileData (tile.TypeChar);
 				selectedTile.ShowTemporary ();
 
@@ -221,7 +221,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 			}
 			Destroy (selectedTile.gameObject);
 
-		} else if (selectedTile.gridType == CrossingTile.GRID_TYPE.PANEL_GRID) {
+		} else if (selectedTile.gridType == CrossingGrid.GRID_TYPE.PANEL_GRID) {
 			var target = wordGrid.TileCloseToPoint(touchPosition, false);
 			if (target != null && target.gameObject.activeSelf && target.tileType == CrossingTile.TILE_TYPE.GAP) {
 				target.SetTileData (selectedTile.TypeChar);

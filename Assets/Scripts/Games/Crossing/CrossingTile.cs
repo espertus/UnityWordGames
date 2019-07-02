@@ -4,11 +4,6 @@ using UnityEngine;
 
 public class CrossingTile : GridTile {
 
-	public enum GRID_TYPE{
-		WORD_GRID,
-		PANEL_GRID
-	}
-		
 	public enum TILE_TYPE {
 		EMPTY,
 		GAP,
@@ -21,7 +16,7 @@ public class CrossingTile : GridTile {
 	public SpriteRenderer outline;
 
 	[HideInInspector]
-	public GRID_TYPE gridType;
+	public CrossingGrid.GRID_TYPE gridType;
 
 	[HideInInspector]
 	public TILE_TYPE tileType;

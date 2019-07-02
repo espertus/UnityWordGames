@@ -3,8 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class CrossingGrid : MonoBehaviour {
+    public enum GRID_TYPE
+    {
+        WORD_GRID,
+        PANEL_GRID
+    }
 
-	public int ROWS = 4;
+    public int ROWS = 4;
 
 	public int COLUMNS = 3;
 
@@ -15,7 +20,7 @@ public class CrossingGrid : MonoBehaviour {
 
 	public float offsetY;
 
-	public CrossingTile.GRID_TYPE gridType;
+	public GRID_TYPE gridType;
 
 	private List<CrossingTile> tiles;
 
