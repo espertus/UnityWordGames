@@ -2,44 +2,48 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CrossingGrid : MonoBehaviour {
+public abstract class CrossingGrid : MonoBehaviour {
     public enum GRID_TYPE
     {
         WORD_GRID,
         PANEL_GRID
     }
 
-    public int ROWS = 4;
-
-	public int COLUMNS = 3;
-
 	public GameObject gridTileGO;
 
 	[HideInInspector]
 	public float GRID_TILE_SIZE;
 
-	public float offsetY;
-
-	public GRID_TYPE gridType;
+    private int rows;
+    private int columns; 
+    private float offsetY;
+    private GRID_TYPE gridType;
 
 	private List<CrossingTile> tiles;
 
 	private List<List<CrossingTile>> gridTiles;
 
+    public CrossingGrid(int rows, int columns, float offsetY, GRID_TYPE gridType)
+    {
+        this.rows = rows;
+        this.columns = columns;
+        this.offsetY = offsetY;
+        this.gridType = gridType;
+    }
 
-	public CrossingTile TileCloseToPoint (Vector2 point, bool mustTouch = true) {
+    public CrossingTile TileCloseToPoint (Vector2 point, bool mustTouch = true) {
 		int c = Mathf.FloorToInt ((point.x - gridTiles[0][0].transform.position.x + ( GRID_TILE_SIZE * 0.5f )) / GRID_TILE_SIZE);
 
 		if (c < 0)
 			return null;
-		if (c >= COLUMNS)
+		if (c >= columns)
 			return null;
 
 		int r =  Mathf.FloorToInt ((gridTiles[0][0].transform.position.y + ( GRID_TILE_SIZE * 0.5f ) - point.y ) /  GRID_TILE_SIZE);
 
 		if (r < 0) return null;
 
-		if (r >= ROWS) return null;
+		if (r >= rows) return null;
 
 		if (gridTiles.Count <= r)
 			return null;
@@ -74,7 +78,7 @@ public class CrossingGrid : MonoBehaviour {
 	public List<CrossingTile> GetRowTiles (int len, int row) {
 
 		var result = new List<CrossingTile> ();
-		var diff = COLUMNS - len;
+		var diff = columns - len;
 		var startIndex = Mathf.FloorToInt (diff / 2);
 
 		while (result.Count < len) {
@@ -90,7 +94,7 @@ public class CrossingGrid : MonoBehaviour {
 		var startIndex = row - Random.Range(0, 4);
 		var bottomHalf = Random.Range (0, 4);
 		while (true) {
-			if (startIndex >= ROWS || (startIndex > row && startIndex - row >= bottomHalf && result.Count >= 3)) {
+			if (startIndex >= rows || (startIndex > row && startIndex - row >= bottomHalf && result.Count >= 3)) {
 				break;
 			}
 			var tile = gridTiles [startIndex] [column];
@@ -116,11 +120,11 @@ public class CrossingGrid : MonoBehaviour {
 		gridTiles = new List<List<CrossingTile>> ();
 
 
-		for (int row = 0; row < ROWS; row++) {
+		for (int row = 0; row < rows; row++) {
 
 			var rowsTiles = new List<CrossingTile>();
 
-			for (int column = 0; column < COLUMNS; column++) {
+			for (int column = 0; column < columns; column++) {
 
 				var item = Instantiate (gridTileGO) as GameObject;
 
@@ -137,6 +141,9 @@ public class CrossingGrid : MonoBehaviour {
 			gridTiles.Add(rowsTiles);
 		}
 
+        UnityEngine.Debug.Log("gridTiles.Count = " + gridTiles.Count);
+        UnityEngine.Debug.Log("gridTiles[0].Count = " + gridTiles[0].Count);
+        UnityEngine.Debug.Log("gridTiles[1].Count = " + gridTiles[1].Count);
 		ScaleGrid ( Mathf.Abs (gridTiles [0] [0].transform.localPosition.y - gridTiles [1] [0].transform.localPosition.y));
 
 	}
@@ -148,8 +155,8 @@ public class CrossingGrid : MonoBehaviour {
 		var stageWidth = 5.0f;
 		var stageHeight = 4.8f;
 
-		var gridWidth = (COLUMNS - 1) * GRID_TILE_SIZE;
-		var gridHeight = (ROWS - 1) * GRID_TILE_SIZE;
+		var gridWidth = (columns - 1) * GRID_TILE_SIZE;
+		var gridHeight = (rows - 1) * GRID_TILE_SIZE;
 
 		var scale = 1.0f;
 

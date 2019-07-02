@@ -5,9 +5,9 @@ using UnityEngine.UI;
 
 public class Crossing : MonoBehaviour, IInputHandler {
 
-	public CrossingGrid wordGrid;
+	public CrossingWordGrid wordGrid;
 
-	public CrossingGrid panelGrid;
+	public CrossingPanelGrid panelGrid;
 
 	public Text wellDone;
 
@@ -210,8 +210,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 				target.ShowPlaced ();
 			} else {
 				target = panelGrid.TileCloseToPoint(touchPosition, false);
-				if (target != null && !target.gameObject.activeSelf) {
-					
+				if (target != null && !target.gameObject.activeSelf) {	
 					target.SetTileData (selectedTile.TypeChar);
 					target.ShowButton ();
 				} else {

@@ -83,7 +83,9 @@
     <Compile Include="Assets\Scripts\Games\Crossing\CrossingDictionary.cs" />
     <Compile Include="Assets\Scripts\Games\Crossing\CrossingEvents.cs" />
     <Compile Include="Assets\Scripts\Games\Crossing\CrossingGrid.cs" />
+    <Compile Include="Assets\Scripts\Games\Crossing\CrossingPanelGrid.cs" />
     <Compile Include="Assets\Scripts\Games\Crossing\CrossingTile.cs" />
+    <Compile Include="Assets\Scripts\Games\Crossing\CrossingWordGrid.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\Hangman.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanGameEvents.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanPanel.cs" />
