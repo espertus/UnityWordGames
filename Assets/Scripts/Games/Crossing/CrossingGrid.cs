@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public abstract class CrossingGrid : MonoBehaviour {
     public enum GRID_TYPE
@@ -14,14 +15,14 @@ public abstract class CrossingGrid : MonoBehaviour {
 	[HideInInspector]
 	public float GRID_TILE_SIZE;
 
-    private int rows;
-    private int columns; 
+    protected int rows;
+    protected int columns; 
     private float offsetY;
     private GRID_TYPE gridType;
 
-	private List<CrossingTile> tiles;
+	protected List<CrossingTile> tiles;
 
-	private List<List<CrossingTile>> gridTiles;
+	protected List<List<CrossingTile>> gridTiles;
 
     public CrossingGrid(int rows, int columns, float offsetY, GRID_TYPE gridType)
     {
@@ -56,52 +57,6 @@ public abstract class CrossingGrid : MonoBehaviour {
 
 		return gridTiles[r][c]; 
 
-	}
-
-	public void ClearTiles () {
-		foreach (var t in tiles) {
-			t.gameObject.SetActive (false);
-		}
-	}
-
-	public void ShowRowChars (List<char> chars) {
-		var i = 0;
-		foreach (var t in tiles) {
-			t.SetTileData (chars [i]);
-			t.ShowPlaced ();
-			i++;
-			if (i == chars.Count)
-				break;
-		}
-	}
-
-	public List<CrossingTile> GetRowTiles (int len, int row) {
-
-		var result = new List<CrossingTile> ();
-		var diff = columns - len;
-		var startIndex = Mathf.FloorToInt (diff / 2);
-
-		while (result.Count < len) {
-			result.Add (gridTiles [row] [startIndex]);
-			startIndex++;
-		}
-
-		return result;
-	}
-
-	public List<CrossingTile> GetColumnTiles ( int row, int column) {
-		var result = new List<CrossingTile> ();
-		var startIndex = row - Random.Range(0, 4);
-		var bottomHalf = Random.Range (0, 4);
-		while (true) {
-			if (startIndex >= rows || (startIndex > row && startIndex - row >= bottomHalf && result.Count >= 3)) {
-				break;
-			}
-			var tile = gridTiles [startIndex] [column];
-			result.Add (tile);
-			startIndex++;
-		}
-		return result;
 	}
 
 	public void BuildGrid ()
@@ -141,9 +96,6 @@ public abstract class CrossingGrid : MonoBehaviour {
 			gridTiles.Add(rowsTiles);
 		}
 
-        UnityEngine.Debug.Log("gridTiles.Count = " + gridTiles.Count);
-        UnityEngine.Debug.Log("gridTiles[0].Count = " + gridTiles[0].Count);
-        UnityEngine.Debug.Log("gridTiles[1].Count = " + gridTiles[1].Count);
 		ScaleGrid ( Mathf.Abs (gridTiles [0] [0].transform.localPosition.y - gridTiles [1] [0].transform.localPosition.y));
 
 	}
