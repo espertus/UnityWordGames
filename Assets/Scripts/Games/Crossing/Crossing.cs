@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class Crossing : MonoBehaviour, IInputHandler {
     private static int ROW_OF_MYSTERY_WORD = 3;
-    private static int MAX_HINTS_PER_CROSS = 2;
+    private static int MAX_HINTS_PER_CROSS = 1;
     private static int HINT_PROBABILITY = 60;
 
 	public CrossingWordGrid wordGrid;
