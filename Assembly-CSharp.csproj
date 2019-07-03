@@ -91,10 +91,12 @@
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanPanel.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanPuzzleData.cs" />
     <Compile Include="Assets\Scripts\Games\Hangman\HangmanWordScorer.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\Libretto.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoDictionary.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoGameEvents.cs" />
-    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoGrid.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoPanelGrid.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoTile.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoWordGrid.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\Scramble.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\ScrambleDictionary.cs" />
     <Compile Include="Assets\Scripts\Games\Scramble\ScrambleGameEvents.cs" />
