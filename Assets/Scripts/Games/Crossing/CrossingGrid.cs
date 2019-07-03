@@ -20,8 +20,10 @@ public abstract class CrossingGrid : MonoBehaviour {
     private float offsetY;
     private GRID_TYPE gridType;
 
+    // All rows*columns tiles, in a one-dimensional list
 	protected List<CrossingTile> tiles;
 
+    // All rows*columns tiles, in a two-dimensional list
 	protected List<List<CrossingTile>> gridTiles;
 
     public CrossingGrid(int rows, int columns, float offsetY, GRID_TYPE gridType)
@@ -69,9 +71,7 @@ public abstract class CrossingGrid : MonoBehaviour {
 			transform.localPosition = Vector2.zero;
 		}
 
-		//a one dimensional list of tiles we can shuffle
 		tiles = new List<CrossingTile> ();
-		//the two dimensional grid
 		gridTiles = new List<List<CrossingTile>> ();
 
 

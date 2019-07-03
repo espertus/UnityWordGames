@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class Crossing : MonoBehaviour, IInputHandler {
+    private static int ROW_OF_MYSTERY_WORD = 3;
+    private static int MAX_HINTS_PER_CROSS = 2;
+    private static int HINT_PROBABILITY = 60;
 
 	public CrossingWordGrid wordGrid;
 
@@ -21,7 +24,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 
 	private int[] wordLen = new int[] { 4,4,4,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,7,7,7,7,7,7,7,7,7,7,7,7,7,7,8 };
 
-	private int difficultyIndex = 0;
+    private int difficultyIndex = 10; //0;
 
 	private CrossingTile tempTileOrigin;
 
@@ -37,7 +40,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 		NewPuzzle ();
 	}
 
-
+    // Replace panel tiles with gap or placed letters in puzzle words.
 	public void Refresh () {
 
 		var buttonChars = new List<char> ();
@@ -68,7 +71,8 @@ public class Crossing : MonoBehaviour, IInputHandler {
 
 		SelectMysteryWord ();
 		difficultyIndex++;
-	}
+        SelectCrossWords();
+    }
 
 	void SelectMysteryWord () {
 		var len = difficultyIndex >= wordLen.Length ? wordLen[wordLen.Length -1] : wordLen [difficultyIndex];
@@ -77,32 +81,30 @@ public class Crossing : MonoBehaviour, IInputHandler {
 
 		Debug.Log ("MYSTERY: " + word);
 
-		mysteryWord = new PuzzleWord (word, wordGrid.GetRowTiles(word.Length, 3) );
+        // Place "mystery word" (really not a mystery).
+		mysteryWord = new PuzzleWord (word, wordGrid.GetRowTiles(word.Length, ROW_OF_MYSTERY_WORD) );
 		var chars = mysteryWord.word.ToCharArray ();
 		for (var n = 0; n < mysteryWord.wordTiles.Count; n++) {
 			mysteryWord.wordTiles [n].SetTileData (chars [n]);
 			mysteryWord.wordTiles [n].ShowFixed ();
 			mysteryWord.wordTiles [n].SetColor (Color.white, Color.black);
 		}
+    }
 
-
-		SelectCrossWords ();
-	}
-
-	void SelectCrossWords () {
+    void SelectCrossWords () {
 		var shuffledTiles = new List<CrossingTile> ();
 		shuffledTiles.AddRange (mysteryWord.wordTiles);
 		shuffledTiles = Utils.Scramble<CrossingTile> (shuffledTiles);
 
-		var num = shuffledTiles.Count - 2;
+		var num = shuffledTiles.Count - 2; // Provide cross-words for all letters except for 2
 		puzzle.Clear ();
 
 		var i = 0;
 		while (puzzle.Count < num) {
 
 			var tile = shuffledTiles [i];
-			var tileChar = tile.TypeChar;
-			var tiles = wordGrid.GetColumnTiles (3, tile.column);
+			//var tileChar = tile.TypeChar;
+			var tiles = wordGrid.GetColumnTiles (ROW_OF_MYSTERY_WORD, tile.column);
 			var pattern = GetVerticalCrossPattern (tiles);
 			var words = CrossingDictionary.Instance.MatchesAPattern (pattern);
 			if (words != null && words.Count != 0) {
@@ -119,12 +121,12 @@ public class Crossing : MonoBehaviour, IInputHandler {
 
 		foreach (var p in puzzle) {
 			var chars = p.word.ToCharArray ();
-			var hints = Random.Range(0, 2);
+			var hints = Random.Range(0, MAX_HINTS_PER_CROSS + 1);
 			Debug.Log ("CROSS: "+ p.word);
 			for (var n = 0; n < p.wordTiles.Count; n++ ) {
 				if (!p.wordTiles [n].gameObject.activeSelf) {
 					
-					if (hints > 0 && Random.Range (0, 10) > 4) {
+					if (hints > 0 && Random.Range (0, 100) <= HINT_PROBABILITY) {
 						p.wordTiles [n].SetTileData (chars [n]);
 						p.wordTiles [n].ShowFixed ();
 						hints--; 
@@ -318,6 +320,7 @@ public class Crossing : MonoBehaviour, IInputHandler {
 	private struct PuzzleWord {
 		public List<CrossingTile> wordTiles;
 		public string word;
+
 		public PuzzleWord (string word, List<CrossingTile> tiles) {
 			this.word = word;
 			this.wordTiles = tiles;
