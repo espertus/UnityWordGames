@@ -10,6 +10,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     private static int MYSTERY_WORD_LENGTH = 8;
     private static int TOP_WORD_LENGTH = 6;
     private static int BOTTOM_WORD_LENGTH = 7;
+    private static int TOP_WORD_ROW = 0;
 
     // Other game objects
     public LibrettoWordGrid wordGrid;
@@ -18,8 +19,8 @@ public class Libretto : MonoBehaviour, IInputHandler
 
     // State for touching and dragging
     private Vector3 touchPosition;
-    private CrossingTile selectedTile;
-    private CrossingTile tempTileOrigin;
+    private LibrettoTile selectedTile;
+    private LibrettoTile tempTileOrigin;
 
     // Words for this round
     private string mysteryWord;
@@ -43,6 +44,8 @@ public class Libretto : MonoBehaviour, IInputHandler
         wordGrid.BuildGrid();
         panelGrid.BuildGrid();
         SelectWords();
+        PlaceWord(topWord, TOP_WORD_ROW);
+        PlaceWord(bottomWord, MYSTERY_WORD_LENGTH - 1);
     }
 
     void SelectWords()
@@ -56,7 +59,20 @@ public class Libretto : MonoBehaviour, IInputHandler
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
-    public void HandleTouchDown(Vector2 touch)
+    void PlaceWord(string word, int row) {
+        //TODO: Set offset argument to GetRowTiles.
+        List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, 0);
+        var chars = word.ToCharArray();
+        for (int i = 0; i < word.Length; i++)
+        {
+            LibrettoTile tile = wordTiles[i];
+            tile.SetTileData(chars[i]);
+            tile.ShowFixed();
+            tile.SetColor(Color.white, Color.black);
+        }
+}
+
+public void HandleTouchDown(Vector2 touch)
     {
 
         ClearSelection();
@@ -80,11 +96,11 @@ public class Libretto : MonoBehaviour, IInputHandler
                 var tempTile = Instantiate(panelGrid.gridTileGO) as GameObject;
                 tempTileOrigin = tile;
 
-                selectedTile = tempTile.GetComponent<CrossingTile>();
+                selectedTile = tempTile.GetComponent<LibrettoTile>();
                 selectedTile.transform.localScale = panelGrid.transform.localScale;
                 selectedTile.transform.parent = wordGrid.transform;
                 selectedTile.transform.localPosition = tile.transform.localPosition;
-                selectedTile.gridType = CrossingGrid.GRID_TYPE.WORD_GRID;
+                selectedTile.gridType = LibrettoGrid.GRID_TYPE.WORD_GRID;
                 selectedTile.SetTileData(tile.TypeChar);
                 selectedTile.ShowTemporary();
 
@@ -111,11 +127,11 @@ public class Libretto : MonoBehaviour, IInputHandler
         }
 
 
-        if (selectedTile.tileType == CrossingTile.TILE_TYPE.TEMPORARY)
+        if (selectedTile.tileType == LibrettoTile.TILE_TYPE.TEMPORARY)
         {
 
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
-            if (target != null && target.gameObject.activeSelf && target.tileType == CrossingTile.TILE_TYPE.GAP)
+            if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
                 target.SetTileData(selectedTile.TypeChar);
                 target.ShowPlaced();
@@ -137,10 +153,10 @@ public class Libretto : MonoBehaviour, IInputHandler
             Destroy(selectedTile.gameObject);
 
         }
-        else if (selectedTile.gridType == CrossingGrid.GRID_TYPE.PANEL_GRID)
+        else if (selectedTile.gridType == LibrettoGrid.GRID_TYPE.PANEL_GRID)
         {
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
-            if (target != null && target.gameObject.activeSelf && target.tileType == CrossingTile.TILE_TYPE.GAP)
+            if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
                 target.SetTileData(selectedTile.TypeChar);
                 target.ShowPlaced();
@@ -157,7 +173,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         else
         {
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
-            if (target != null && target.gameObject.activeSelf && target.tileType == CrossingTile.TILE_TYPE.GAP)
+            if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
                 target.SetTileData(selectedTile.TypeChar);
                 selectedTile.ShowGap();
@@ -197,7 +213,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     {
             foreach (var t in puzzleWord.wordTiles)
             {
-                if (t.tileType == CrossingTile.TILE_TYPE.PLACED)
+                if (t.tileType == LibrettoTile.TILE_TYPE.PLACED)
                 {
                     t.ShowPlaced();
                 }
@@ -255,10 +271,10 @@ public class Libretto : MonoBehaviour, IInputHandler
 
     private struct PuzzleWord
     {
-        public List<CrossingTile> wordTiles;
+        public List<LibrettoTile> wordTiles;
         public string word;
 
-        public PuzzleWord(string word, List<CrossingTile> tiles)
+        public PuzzleWord(string word, List<LibrettoTile> tiles)
         {
             this.word = word;
             this.wordTiles = tiles;
@@ -270,7 +286,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             {
                 if (!t.gameObject.activeSelf)
                     return false;
-                if (t.tileType == CrossingTile.TILE_TYPE.GAP)
+                if (t.tileType == LibrettoTile.TILE_TYPE.GAP)
                     return false;
             }
             return true;
