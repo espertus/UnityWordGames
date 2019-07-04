@@ -26,6 +26,8 @@ public class Libretto : MonoBehaviour, IInputHandler
     private string mysteryWord;
     private string topWord;
     private string bottomWord;
+    private int topIntersectPos;
+    private int bottomIntersectPos;
     private PuzzleWord puzzleWord;
 
     void Start()
@@ -44,9 +46,29 @@ public class Libretto : MonoBehaviour, IInputHandler
         wordGrid.BuildGrid();
         panelGrid.BuildGrid();
         SelectWords();
-        PlaceWord(topWord, TOP_WORD_ROW);
-        PlaceWord(bottomWord, MYSTERY_WORD_LENGTH - 1);
-    }
+        int diff = bottomIntersectPos - topIntersectPos;
+        int off1, off2;
+        List < LibrettoTile > tiles = wordGrid.GetColumnTiles(diff > 0 ? diff : -diff, mysteryWord.Length);
+        if (diff >  0)
+        {
+            off1 = diff;
+            off2 = 0;
+        }
+        else
+        {
+            off1 = 0;
+            off2 = -diff;
+        }
+        PlaceWord(topWord, TOP_WORD_ROW, off1);
+        PlaceWord(bottomWord, MYSTERY_WORD_LENGTH - 1, off2);
+        puzzleWord = new PuzzleWord(mysteryWord, tiles);
+        foreach (LibrettoTile tile in  tiles) {
+            if (tile.tileType == LibrettoTile.TILE_TYPE.EMPTY)
+            {
+                tile.ShowGap();
+            }
+        }
+    } 
 
     void SelectWords()
     {
@@ -54,14 +76,17 @@ public class Libretto : MonoBehaviour, IInputHandler
         Assert.IsNotNull(mysteryWord); 
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
         topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0]);
-        UnityEngine.Debug.Log("topWord: " + topWord);
+        topIntersectPos = topWord.IndexOf(mysteryWord[0]);
+        Assert.AreNotEqual(-1, topIntersectPos);
+        UnityEngine.Debug.Log("topWord: " + topWord + "\ttopIntersectPos: " + topIntersectPos);
         bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1]);
+        bottomIntersectPos = bottomWord.IndexOf(mysteryWord[mysteryWord.Length - 1]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
-    void PlaceWord(string word, int row) {
-        //TODO: Set offset argument to GetRowTiles.
-        List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, 0);
+    void PlaceWord(string word, int row, int offset) {
+        UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
+        List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, offset);
         var chars = word.ToCharArray();
         for (int i = 0; i < word.Length; i++)
         {

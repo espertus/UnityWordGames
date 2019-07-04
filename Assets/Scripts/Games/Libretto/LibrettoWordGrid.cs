@@ -5,12 +5,12 @@ using UnityEngine.Assertions;
 
 public class LibrettoWordGrid : LibrettoGrid
 {
-    private static int ROWS = 12;
+    private static int ROWS = 18;
     private static int COLUMNS = 10;
     private static float Y_OFFSET = 2.2f;
 
-    private static int MAX_ABOVE_LETTERS = 3;
-    private static int MAX_BELOW_LETTERS = 3;
+    private static int MAX_ABOVE_LETTERS = 0;
+    private static int MAX_BELOW_LETTERS = 0;
     private static int MIN_CROSS_LENGTH = 3;
 
     public LibrettoWordGrid() : base(ROWS, COLUMNS, Y_OFFSET, GRID_TYPE.WORD_GRID) { }
@@ -29,9 +29,14 @@ public class LibrettoWordGrid : LibrettoGrid
         return result;
     }
 
-    public List<LibrettoTile> GetColumnTiles(int row, int column)
+    public List<LibrettoTile> GetColumnTiles(int column, int len)
     {
         var result = new List<LibrettoTile>();
+        for (int row = 0; row < len; row++)
+        {
+            result.Add(gridTiles[row][column]);
+        }
+        /*
         var startIndex = row - Random.Range(0, MAX_ABOVE_LETTERS + 1);
         var bottomHalf = Random.Range(0, MAX_BELOW_LETTERS + 1);
         while (true)
@@ -44,6 +49,7 @@ public class LibrettoWordGrid : LibrettoGrid
             result.Add(tile);
             startIndex++;
         }
+        */
         return result;
     }
 
