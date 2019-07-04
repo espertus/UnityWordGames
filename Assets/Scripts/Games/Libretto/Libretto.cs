@@ -26,8 +26,8 @@ public class Libretto : MonoBehaviour, IInputHandler
     private string mysteryWord;
     private string topWord;
     private string bottomWord;
-    private int topIntersectPos;
-    private int bottomIntersectPos;
+    private int topIntercept;
+    private int bottomIntercept;
     private PuzzleWord puzzleWord;
 
     void Start()
@@ -46,21 +46,15 @@ public class Libretto : MonoBehaviour, IInputHandler
         wordGrid.BuildGrid();
         panelGrid.BuildGrid();
         SelectWords();
-        int diff = bottomIntersectPos - topIntersectPos;
-        int off1, off2;
-        List < LibrettoTile > tiles = wordGrid.GetColumnTiles(diff > 0 ? diff : -diff, mysteryWord.Length);
-        if (diff >  0)
-        {
-            off1 = diff;
-            off2 = 0;
-        }
-        else
-        {
-            off1 = 0;
-            off2 = -diff;
-        }
-        PlaceWord(topWord, TOP_WORD_ROW, off1);
-        PlaceWord(bottomWord, MYSTERY_WORD_LENGTH - 1, off2);
+
+        // Place horizontal words.
+        int diff = topIntercept - bottomIntercept;
+        bool topAtLeft = diff >= 0;
+        diff = diff > 0 ? diff : -diff;
+        PlaceWord(topWord, 0, topAtLeft ? 0 : diff);
+        PlaceWord(bottomWord, mysteryWord.Length - 1, topAtLeft ? diff : 0);
+
+        List<LibrettoTile> tiles = wordGrid.GetColumnTiles(diff, mysteryWord.Length);
         puzzleWord = new PuzzleWord(mysteryWord, tiles);
         foreach (LibrettoTile tile in  tiles) {
             if (tile.tileType == LibrettoTile.TILE_TYPE.EMPTY)
@@ -76,11 +70,11 @@ public class Libretto : MonoBehaviour, IInputHandler
         Assert.IsNotNull(mysteryWord); 
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
         topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0]);
-        topIntersectPos = topWord.IndexOf(mysteryWord[0]);
-        Assert.AreNotEqual(-1, topIntersectPos);
-        UnityEngine.Debug.Log("topWord: " + topWord + "\ttopIntersectPos: " + topIntersectPos);
+        topIntercept = topWord.IndexOf(mysteryWord[0]);
+        Assert.AreNotEqual(-1, topIntercept);
+        UnityEngine.Debug.Log("topWord: " + topWord);
         bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1]);
-        bottomIntersectPos = bottomWord.IndexOf(mysteryWord[mysteryWord.Length - 1]);
+        bottomIntercept = bottomWord.IndexOf(mysteryWord[mysteryWord.Length - 1]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
