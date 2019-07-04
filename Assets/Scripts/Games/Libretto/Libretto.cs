@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Assertions;
+
 
 public class Libretto : MonoBehaviour, IInputHandler
 {
@@ -46,10 +48,11 @@ public class Libretto : MonoBehaviour, IInputHandler
     void SelectWords()
     {
         mysteryWord = LibrettoDictionary.Instance.getRandomWord(MYSTERY_WORD_LENGTH);
-        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0]);
-        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1]);
+        Assert.IsNotNull(mysteryWord); 
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
+        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0]);
         UnityEngine.Debug.Log("topWord: " + topWord);
+        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 

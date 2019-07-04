@@ -8,8 +8,8 @@ using UnityEngine.Assertions;
 public class LibrettoDictionary : MonoBehaviour
 {
     private static int MIN_LENGTH = 3;
-    private static int MAX_LENGTH = 10;
-    private static int MAX_GROUP = 5;
+    private static int MAX_LENGTH = 10; // This limit does not apply to allWords.
+    private static int MAX_GROUP = 4;
     private static LibrettoDictionary _instance = null;
     private static System.Random random = new System.Random();
 
@@ -37,20 +37,39 @@ public class LibrettoDictionary : MonoBehaviour
         StartCoroutine("LoadWordData");
     }
 
+    private bool IsGroupSeparator(string word)
+    {
+        return word.IndexOf('#') != -1;
+    }
+
     // was IEnumerator
     void LoadWordData()
     {
-
         // Read in all words from file.
         string dictionaryPath = System.IO.Path.Combine(Application.streamingAssetsPath, "wordsByFrequency.txt");
         string result = System.IO.File.ReadAllText(dictionaryPath);
         var words = result.Split('\n');
 
         // Count words of each length.
+        int group = 0;
         int[] countsByLength = new int[MAX_LENGTH + 1];
         foreach (var w in words)
         {
-            countsByLength[w.Length]++;
+            if (IsGroupSeparator(w))
+            {
+                if (++group > MAX_GROUP)
+                {
+                    break;
+                }
+
+            }
+            else
+            {
+                if (w.Length >= MIN_LENGTH && w.Length <= MAX_LENGTH)
+                {
+                    countsByLength[w.Length]++;
+                }
+            }
         }
 
         // Allocate data structures for words.
@@ -63,7 +82,7 @@ public class LibrettoDictionary : MonoBehaviour
 
         // Populate data structures.
         int[] counts = new int[MAX_LENGTH + 1]; // Current length
-        var group = 0;
+        group = 0;
         foreach (var w in words)
         {
             if (string.IsNullOrEmpty(w) || w.Length < MIN_LENGTH)
@@ -73,19 +92,16 @@ public class LibrettoDictionary : MonoBehaviour
 
             // A line beginning with # indicates that we are getting to
             // words of lower frequency. 
-            if (word.IndexOf('#') == -1)
-            {
-                if (group <= MAX_GROUP)
+            if (IsGroupSeparator(word)) {
+                group++;
+            } else {
+                if (group <= MAX_GROUP && word.Length <= MAX_LENGTH)
                 {
                     int len = w.Length;
                     Assert.IsTrue(counts[len] < countsByLength[len]);
                     wordsOfLength[len][counts[len]++] = word;
                 }
                 allWords.Add(word);
-            }
-            else
-            {
-                group++;
             }
         }
 
@@ -117,9 +133,12 @@ public class LibrettoDictionary : MonoBehaviour
     {
         UnityEngine.Assertions.Assert.IsTrue(len <= MAX_LENGTH);
         string word;
+        //Debug.Log("Count of words of length " + len + ": " + wordsOfLength[len].Length);
+        //Debug.Log("containing: " + containing);
         while (true)
         {
             word = wordsOfLength[len][random.Next(0, wordsOfLength[len].Length)];
+            Assert.IsNotNull(word);
             if (containing == '-' || word.IndexOf(containing) != -1)
             {
                 return word;
@@ -127,7 +146,7 @@ public class LibrettoDictionary : MonoBehaviour
         }
         // This will be reached only if there are no words of the requested
         // length with the specified letter. 
-        Assert.IsTrue(true);
+        Assert.IsTrue(false);
         return null;
     }
 }
