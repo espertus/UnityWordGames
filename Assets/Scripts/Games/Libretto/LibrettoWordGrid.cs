@@ -6,7 +6,7 @@ using UnityEngine.Assertions;
 public class LibrettoWordGrid : LibrettoGrid
 {
     private static int ROWS = 18;
-    private static int COLUMNS = 10;
+    private static int COLUMNS = 20;
     private static float Y_OFFSET = 2.2f;
 
     private static int MAX_ABOVE_LETTERS = 0;

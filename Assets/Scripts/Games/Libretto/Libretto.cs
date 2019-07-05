@@ -47,7 +47,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         panelGrid.BuildGrid();
         SelectWords();
 
-        // Place horizontal words.
+        // Place horizontal words and select tiles for vertical word.
         int diff = topIntercept - bottomIntercept;
         List<LibrettoTile> tiles;
         if (diff >= 0)
@@ -62,13 +62,24 @@ public class Libretto : MonoBehaviour, IInputHandler
             PlaceWord(bottomWord, mysteryWord.Length - 1, 0);
             tiles = wordGrid.GetColumnTiles(bottomIntercept, mysteryWord.Length);
         }
+
+        // Show gap tiles and build up letters for panel.
         puzzleWord = new PuzzleWord(mysteryWord, tiles);
-        foreach (LibrettoTile tile in  tiles) {
+        var buttonChars = new List<char>();
+        for (int i = 0; i < mysteryWord.Length; i++)
+        {
+            LibrettoTile tile = tiles[i];
             if (tile.tileType == LibrettoTile.TILE_TYPE.EMPTY)
             {
                 tile.ShowGap();
+                buttonChars.Add(mysteryWord[i]);
             }
         }
+
+        // Add scrambled letters to panel.
+        buttonChars = Utils.Scramble<char>(buttonChars);
+        Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
+        panelGrid.ShowRowChars(buttonChars);
     } 
 
     void SelectWords()
@@ -99,7 +110,8 @@ public class Libretto : MonoBehaviour, IInputHandler
 }
 
 public void HandleTouchDown(Vector2 touch)
-    {
+{
+        Debug.Log("Entering HandleTouchDown()");
 
         ClearSelection();
 
