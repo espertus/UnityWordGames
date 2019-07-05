@@ -49,12 +49,19 @@ public class Libretto : MonoBehaviour, IInputHandler
 
         // Place horizontal words.
         int diff = topIntercept - bottomIntercept;
-        bool topAtLeft = diff >= 0;
-        diff = diff > 0 ? diff : -diff;
-        PlaceWord(topWord, 0, topAtLeft ? 0 : diff);
-        PlaceWord(bottomWord, mysteryWord.Length - 1, topAtLeft ? diff : 0);
-
-        List<LibrettoTile> tiles = wordGrid.GetColumnTiles(diff, mysteryWord.Length);
+        List<LibrettoTile> tiles;
+        if (diff >= 0)
+        {
+            PlaceWord(topWord, 0, 0);
+            PlaceWord(bottomWord, mysteryWord.Length - 1, diff);
+            tiles = wordGrid.GetColumnTiles(topIntercept, mysteryWord.Length);
+        }
+        else
+        {
+            PlaceWord(topWord, 0, -diff);
+            PlaceWord(bottomWord, mysteryWord.Length - 1, 0);
+            tiles = wordGrid.GetColumnTiles(bottomIntercept, mysteryWord.Length);
+        }
         puzzleWord = new PuzzleWord(mysteryWord, tiles);
         foreach (LibrettoTile tile in  tiles) {
             if (tile.tileType == LibrettoTile.TILE_TYPE.EMPTY)
