@@ -470,7 +470,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1ada754534b6e4c3d95cc711273e65fc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridTileGO: {fileID: 180208, guid: 9e084e3c010bb44099047df2458bcbb9, type: 3}
+  gridTileGO: {fileID: 180208, guid: 59c8284eeec4b4dd4b60f72741fb79b1, type: 3}
   GRID_TILE_SIZE: 0
 --- !u!1 &1706984111
 GameObject:
@@ -746,5 +746,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5301ce7a9a5eb4394ba0724ed1f78ed0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gridTileGO: {fileID: 180208, guid: 9e084e3c010bb44099047df2458bcbb9, type: 3}
+  gridTileGO: {fileID: 180208, guid: 59c8284eeec4b4dd4b60f72741fb79b1, type: 3}
   GRID_TILE_SIZE: 0
