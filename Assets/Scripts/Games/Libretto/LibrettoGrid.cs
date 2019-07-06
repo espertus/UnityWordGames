@@ -13,7 +13,7 @@ public abstract class LibrettoGrid : MonoBehaviour {
     public GameObject gridTileGO;
 
     [HideInInspector]
-    public float GRID_TILE_SIZE;
+    public float gridTileSize;
 
     protected int rows;
     protected int columns; 
@@ -35,14 +35,16 @@ public abstract class LibrettoGrid : MonoBehaviour {
     }
 
     public LibrettoTile TileCloseToPoint (Vector2 point, bool mustTouch = true) {
-        int c = Mathf.FloorToInt ((point.x - gridTiles[0][0].transform.position.x + ( GRID_TILE_SIZE * 0.5f )) / GRID_TILE_SIZE);
+        Debug.Log("Libretto: In TileCloseToPoint, point.x = " + point.x + ", point.y = " + point.y);
+        Debug.Log("Libretto: gridTileSize = " + gridTileSize);
+        int c = Mathf.FloorToInt ((point.x - gridTiles[0][0].transform.position.x + ( gridTileSize * 0.5f )) / gridTileSize);
 
         if (c < 0)
             return null;
         if (c >= columns)
             return null;
 
-        int r =  Mathf.FloorToInt ((gridTiles[0][0].transform.position.y + ( GRID_TILE_SIZE * 0.5f ) - point.y ) /  GRID_TILE_SIZE);
+        int r =  Mathf.FloorToInt ((gridTiles[0][0].transform.position.y + ( gridTileSize * 0.5f ) - point.y ) /  gridTileSize);
 
         if (r < 0) return null;
 
@@ -103,13 +105,13 @@ public abstract class LibrettoGrid : MonoBehaviour {
 
     private void ScaleGrid ( float tileSize) {
 
-        GRID_TILE_SIZE = tileSize;
+        gridTileSize = tileSize;
 
         var stageWidth = 5.0f;
         var stageHeight = 4.8f;
 
-        var gridWidth = (columns - 1) * GRID_TILE_SIZE;
-        var gridHeight = (rows - 1) * GRID_TILE_SIZE;
+        var gridWidth = (columns - 1) * gridTileSize;
+        var gridHeight = (rows - 1) * gridTileSize;
 
         var scale = 1.0f;
 
@@ -124,7 +126,7 @@ public abstract class LibrettoGrid : MonoBehaviour {
             transform.localScale = new Vector2(scale, scale);
         }
 
-        GRID_TILE_SIZE *= scale;
+        gridTileSize *= scale;
         transform.localPosition = new Vector2 ((gridWidth * scale) * -0.5f , (3.5f - 0.5f * (gridHeight * scale))  + offsetY);
     }
 

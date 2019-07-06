@@ -97,7 +97,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     }
 
     void PlaceWord(string word, int row, int offset) {
-        UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
+   //     UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
         List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, offset);
         var chars = word.ToCharArray();
         for (int i = 0; i < word.Length; i++)
@@ -111,16 +111,18 @@ public class Libretto : MonoBehaviour, IInputHandler
 
 public void HandleTouchDown(Vector2 touch)
 {
-        Debug.Log("Entering HandleTouchDown()");
+        Debug.Log("Libretto: Entering HandleTouchDown(" + touch.x + ", " + touch.y + ")");
 
         ClearSelection();
 
         touchPosition = Camera.main.ScreenToWorldPoint(touch);
         touchPosition.z = 0;
 
-
+        Debug.Log("Libretto: About to call panelGrid.TileCloseToPoint()");
         //check panel grid
         var tile = panelGrid.TileCloseToPoint(touchPosition);
+        Debug.Log("Libretto: Back from panelGrid.TileCloseToPoint()");
+        Debug.Log("Libretto: Checking for touch of panel tile: " + (tile == null ? "null" : "not null"));
 
 
         if (tile == null || !tile.gameObject.activeSelf)
@@ -128,6 +130,7 @@ public void HandleTouchDown(Vector2 touch)
 
             //check word grid
             tile = wordGrid.TileCloseToPoint(touchPosition);
+            Debug.Log("Checking for touch of word tile: " + tile);
             if (tile != null && tile.gameObject.activeSelf && tile.IsMovable())
             {
                 //pick tile from panel
@@ -149,6 +152,7 @@ public void HandleTouchDown(Vector2 touch)
         else
         {
             selectedTile = tile;
+            Debug.Log("Libretto: Selected tile " + tile); 
         }
 
         if (selectedTile != null) selectedTile.Select(true);
