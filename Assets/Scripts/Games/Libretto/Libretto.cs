@@ -7,10 +7,10 @@ using UnityEngine.Assertions;
 
 public class Libretto : MonoBehaviour, IInputHandler
 {
-    private static int MYSTERY_WORD_LENGTH = 8;
-    private static int TOP_WORD_LENGTH = 6;
-    private static int BOTTOM_WORD_LENGTH = 7;
-    private static int TOP_WORD_ROW = 0;
+    public static int MYSTERY_WORD_LENGTH = 8;
+    public static int TOP_WORD_LENGTH = 6;
+    public static int BOTTOM_WORD_LENGTH = 7;
+    public static int TOP_WORD_ROW = 0;
 
     // Other game objects
     public LibrettoWordGrid wordGrid;
@@ -49,6 +49,7 @@ public class Libretto : MonoBehaviour, IInputHandler
 
         // Place horizontal words and select tiles for vertical word.
         int diff = topIntercept - bottomIntercept;
+        Assert.AreEqual(0, diff); // currently constrained to be at some intercepts
         List<LibrettoTile> tiles;
         if (diff >= 0)
         {
@@ -87,17 +88,19 @@ public class Libretto : MonoBehaviour, IInputHandler
         mysteryWord = LibrettoDictionary.Instance.getRandomWord(MYSTERY_WORD_LENGTH);
         Assert.IsNotNull(mysteryWord); 
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
-        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0]);
+        // The 0 for the pos argument to the calls to getRandomWord() 
+        // constrain the characters to being at the very start of the
+        // crossing words. TODO: Loosen this constraint.
+        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0], 0);
         topIntercept = topWord.IndexOf(mysteryWord[0]);
-        Assert.AreNotEqual(-1, topIntercept);
         UnityEngine.Debug.Log("topWord: " + topWord);
-        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1]);
+        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1], 0);
         bottomIntercept = bottomWord.IndexOf(mysteryWord[mysteryWord.Length - 1]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
     void PlaceWord(string word, int row, int offset) {
-   //     UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
+        UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
         List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, offset);
         var chars = word.ToCharArray();
         for (int i = 0; i < word.Length; i++)
@@ -111,18 +114,13 @@ public class Libretto : MonoBehaviour, IInputHandler
 
 public void HandleTouchDown(Vector2 touch)
 {
-        Debug.Log("Libretto: Entering HandleTouchDown(" + touch.x + ", " + touch.y + ")");
-
         ClearSelection();
 
         touchPosition = Camera.main.ScreenToWorldPoint(touch);
         touchPosition.z = 0;
 
-        Debug.Log("Libretto: About to call panelGrid.TileCloseToPoint()");
         //check panel grid
         var tile = panelGrid.TileCloseToPoint(touchPosition);
-        Debug.Log("Libretto: Back from panelGrid.TileCloseToPoint()");
-        Debug.Log("Libretto: Checking for touch of panel tile: " + (tile == null ? "null" : "not null"));
 
 
         if (tile == null || !tile.gameObject.activeSelf)
@@ -130,7 +128,6 @@ public void HandleTouchDown(Vector2 touch)
 
             //check word grid
             tile = wordGrid.TileCloseToPoint(touchPosition);
-            Debug.Log("Checking for touch of word tile: " + tile);
             if (tile != null && tile.gameObject.activeSelf && tile.IsMovable())
             {
                 //pick tile from panel
@@ -151,8 +148,7 @@ public void HandleTouchDown(Vector2 touch)
         }
         else
         {
-            selectedTile = tile;
-            Debug.Log("Libretto: Selected tile " + tile); 
+            selectedTile = tile; 
         }
 
         if (selectedTile != null) selectedTile.Select(true);
@@ -242,7 +238,6 @@ public void HandleTouchDown(Vector2 touch)
 
     private void ClearSelection()
     {
-
         if (selectedTile != null)
         {
             selectedTile.selected = false;

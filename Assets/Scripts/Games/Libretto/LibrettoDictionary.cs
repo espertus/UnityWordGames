@@ -129,17 +129,27 @@ public class LibrettoDictionary : MonoBehaviour
     /// <returns>The random word.</returns>
     /// <param name="len">the length of the word</param>
     /// <param name="containing">a letter that the word must contain, or '-'</param>
-    public string getRandomWord(int len, char containing = '-')
+    /// <param name="pos">the position of the contained letter, of -1 if unrestricted</param>
+    public string getRandomWord(int len, char containing = '-', int pos = -1)
     {
         UnityEngine.Assertions.Assert.IsTrue(len <= MAX_LENGTH);
         string word;
-        //Debug.Log("Count of words of length " + len + ": " + wordsOfLength[len].Length);
-        //Debug.Log("containing: " + containing);
         while (true)
         {
             word = wordsOfLength[len][random.Next(0, wordsOfLength[len].Length)];
             Assert.IsNotNull(word);
-            if (containing == '-' || word.IndexOf(containing) != -1)
+            // No constraints on returned word
+            if (containing == '-')
+            {
+                return word;
+            }
+            // No constraints on position of contained letter
+            if (pos == -1 && word.IndexOf(containing) != -1)
+            {
+                return word;
+            }
+            // Required character in required position
+            if (pos < word.Length && word[pos] == containing)
             {
                 return word;
             }

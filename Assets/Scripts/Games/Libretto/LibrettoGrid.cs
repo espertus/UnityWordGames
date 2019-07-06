@@ -35,8 +35,6 @@ public abstract class LibrettoGrid : MonoBehaviour {
     }
 
     public LibrettoTile TileCloseToPoint (Vector2 point, bool mustTouch = true) {
-        Debug.Log("Libretto: In TileCloseToPoint, point.x = " + point.x + ", point.y = " + point.y);
-        Debug.Log("Libretto: gridTileSize = " + gridTileSize);
         int c = Mathf.FloorToInt ((point.x - gridTiles[0][0].transform.position.x + ( gridTileSize * 0.5f )) / gridTileSize);
 
         if (c < 0)
@@ -127,6 +125,9 @@ public abstract class LibrettoGrid : MonoBehaviour {
         }
 
         gridTileSize *= scale;
+        var x = (gridWidth * scale) * -0.5f;
+        var y = (3.5f - 0.5f * (gridHeight * scale)) + offsetY;
+        Debug.Log("localPosition = (" + x + ", " + y + ")");
         transform.localPosition = new Vector2 ((gridWidth * scale) * -0.5f , (3.5f - 0.5f * (gridHeight * scale))  + offsetY);
     }
 

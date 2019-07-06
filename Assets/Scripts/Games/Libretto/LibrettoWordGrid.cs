@@ -1,13 +1,14 @@
-﻿using System.Collections;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 public class LibrettoWordGrid : LibrettoGrid
 {
-    private static int ROWS = 18;
-    private static int COLUMNS = 20;
-    private static float Y_OFFSET = 2.2f;
+    private static int ROWS = Libretto.MYSTERY_WORD_LENGTH + Libretto.TOP_WORD_ROW;
+    private static int COLUMNS = System.Math.Max(Libretto.TOP_WORD_LENGTH, Libretto.BOTTOM_WORD_LENGTH);
+    private static float Y_OFFSET = 2.2f; // number doesn't seem to matter
 
     private static int MAX_ABOVE_LETTERS = 0;
     private static int MAX_BELOW_LETTERS = 0;
@@ -18,7 +19,8 @@ public class LibrettoWordGrid : LibrettoGrid
     public List<LibrettoTile> GetRowTiles(int len, int row, int offset)
     {
         var result = new List<LibrettoTile>();
-        Assert.IsTrue(len + offset < columns);
+        Debug.Log("In GetRowTiles(" + len + ", " + row + ", " + offset + "), columns = " + columns);
+        Assert.IsTrue(len + offset <= columns);
         Assert.IsTrue(row < rows);
         Assert.AreEqual(columns, gridTiles[row].Count);
 
