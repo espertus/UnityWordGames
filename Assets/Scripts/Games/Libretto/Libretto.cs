@@ -12,6 +12,8 @@ public class Libretto : MonoBehaviour, IInputHandler
     public static int BOTTOM_WORD_LENGTH = 7;
     public static int TOP_WORD_ROW = 0;
     private static int NUM_DISTRACTERS = 2;
+    private static int MAX_ABOVE_LETTERS = 2;
+    private static int MAX_BELOW_LETTERS = 2;
 
     // Other game objects
     public LibrettoWordGrid wordGrid;
@@ -31,6 +33,8 @@ public class Libretto : MonoBehaviour, IInputHandler
     private int bottomIntercept;
     private PuzzleWord puzzleWord;
     private List<char> buttonChars;
+    private int topWordRow;
+    private int bottomWordRow;
 
     void Start()
     {
@@ -50,19 +54,19 @@ public class Libretto : MonoBehaviour, IInputHandler
         SelectWords();
 
         // Place horizontal words and select tiles for vertical word.
+        Assert.AreEqual(topIntercept, bottomIntercept); // currently constrained to be at some intercepts
         int diff = topIntercept - bottomIntercept;
-        Assert.AreEqual(0, diff); // currently constrained to be at some intercepts
         List<LibrettoTile> tiles;
         if (diff >= 0)
         {
-            PlaceWord(topWord, 0, 0);
-            PlaceWord(bottomWord, mysteryWord.Length - 1, diff);
+            PlaceWord(topWord, topWordRow, 0);
+            PlaceWord(bottomWord, bottomWordRow, diff);
             tiles = wordGrid.GetColumnTiles(topIntercept, mysteryWord.Length);
         }
         else
         {
-            PlaceWord(topWord, 0, -diff);
-            PlaceWord(bottomWord, mysteryWord.Length - 1, 0);
+            PlaceWord(topWord, topWordRow, -diff);
+            PlaceWord(bottomWord, bottomWordRow, 0);
             tiles = wordGrid.GetColumnTiles(bottomIntercept, mysteryWord.Length);
         }
 
@@ -94,20 +98,19 @@ public class Libretto : MonoBehaviour, IInputHandler
         mysteryWord = LibrettoDictionary.Instance.getRandomWord(MYSTERY_WORD_LENGTH);
         Assert.IsNotNull(mysteryWord);
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
-        // The 0 for the pos argument to the calls to getRandomWord() 
-        // constrain the characters to being at the very start of the
-        // crossing words. TODO: Loosen this constraint.
-        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[0], 0);
-        topIntercept = topWord.IndexOf(mysteryWord[0]);
+        topWordRow = UnityEngine.Random.Range(0, MAX_ABOVE_LETTERS + 1);
+        topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[topWordRow], 0);
+        topIntercept = topWord.IndexOf(mysteryWord[topWordRow]);
         UnityEngine.Debug.Log("topWord: " + topWord);
-        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[mysteryWord.Length - 1], 0);
-        bottomIntercept = bottomWord.IndexOf(mysteryWord[mysteryWord.Length - 1]);
+        bottomWordRow = mysteryWord.Length - topWordRow - UnityEngine.Random.Range(0, MAX_BELOW_LETTERS + 1) - 1;
+        bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[bottomWordRow], 0);
+        bottomIntercept = bottomWord.IndexOf(mysteryWord[bottomWordRow]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
     void PlaceWord(string word, int row, int offset)
     {
-        UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
+        //UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
         List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, offset);
         var chars = word.ToCharArray();
         for (int i = 0; i < word.Length; i++)
@@ -341,8 +344,38 @@ public class Libretto : MonoBehaviour, IInputHandler
             this.wordTiles = tiles;
         }
 
+        // This assumes there are exactly 2 CLUE tiles in each word.
         public bool IsCompleted()
         {
+            /*
+            int BEFORE = 0;
+            int WITHIN = 1;
+            int AFTER = 2;
+            int state = BEFORE;
+
+            foreach (var t in wordTiles)
+            {
+                if (!t.gameObject.activeSelf)
+                {
+                    return false;
+                }
+                switch(t.tileType)
+                {
+                    case LibrettoTile.TILE_TYPE.GAP:
+                        return state == AFTER;
+                    case LibrettoTile.TILE_TYPE.CLUE:
+                        state++;
+                        break;
+                    case LibrettoTile.TILE_TYPE.PLACED:
+                        break;
+                    default:
+                        Assert.IsEqual(-1, t.tileType);
+
+                }
+            }
+            return false;
+            */           
+     
             foreach (var t in wordTiles)
             {
                 if (!t.gameObject.activeSelf)
