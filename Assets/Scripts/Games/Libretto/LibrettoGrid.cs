@@ -21,7 +21,7 @@ public abstract class LibrettoGrid : MonoBehaviour {
     private GRID_TYPE gridType;
 
     // All rows*columns tiles, in a one-dimensional list
-    protected List<LibrettoTile> tiles;
+    public List<LibrettoTile> tiles;
 
     // All rows*columns tiles, in a two-dimensional list
     protected List<List<LibrettoTile>> gridTiles;

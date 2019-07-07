@@ -8,7 +8,7 @@ using UnityEngine.Assertions;
 public class Libretto : MonoBehaviour, IInputHandler
 {
     public static int MYSTERY_WORD_LENGTH = 8;
-    public static int TOP_WORD_LENGTH = 6;
+    public static int TOP_WORD_LENGTH = 7;
     public static int BOTTOM_WORD_LENGTH = 7;
     public static int TOP_WORD_ROW = 0;
 
@@ -22,13 +22,14 @@ public class Libretto : MonoBehaviour, IInputHandler
     private LibrettoTile selectedTile;
     private LibrettoTile tempTileOrigin;
 
-    // Words for this round
+    // State for this round
     private string mysteryWord;
     private string topWord;
     private string bottomWord;
     private int topIntercept;
     private int bottomIntercept;
     private PuzzleWord puzzleWord;
+    private List<char> buttonChars;
 
     void Start()
     {
@@ -66,7 +67,7 @@ public class Libretto : MonoBehaviour, IInputHandler
 
         // Show gap tiles and build up letters for panel.
         puzzleWord = new PuzzleWord(mysteryWord, tiles);
-        var buttonChars = new List<char>();
+        buttonChars = new List<char>();
         for (int i = 0; i < mysteryWord.Length; i++)
         {
             LibrettoTile tile = tiles[i];
@@ -81,12 +82,12 @@ public class Libretto : MonoBehaviour, IInputHandler
         buttonChars = Utils.Scramble<char>(buttonChars);
         Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
         panelGrid.ShowRowChars(buttonChars);
-    } 
+    }
 
     void SelectWords()
     {
         mysteryWord = LibrettoDictionary.Instance.getRandomWord(MYSTERY_WORD_LENGTH);
-        Assert.IsNotNull(mysteryWord); 
+        Assert.IsNotNull(mysteryWord);
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
         // The 0 for the pos argument to the calls to getRandomWord() 
         // constrain the characters to being at the very start of the
@@ -99,7 +100,8 @@ public class Libretto : MonoBehaviour, IInputHandler
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
-    void PlaceWord(string word, int row, int offset) {
+    void PlaceWord(string word, int row, int offset)
+    {
         UnityEngine.Debug.Log("PlaceWord(word = " + word + ", row = " + row + ", offset = " + offset + ")");
         List<LibrettoTile> wordTiles = wordGrid.GetRowTiles(word.Length, row, offset);
         var chars = word.ToCharArray();
@@ -110,10 +112,26 @@ public class Libretto : MonoBehaviour, IInputHandler
             tile.ShowFixed();
             tile.SetColor(Color.white, Color.black);
         }
-}
+    }
 
-public void HandleTouchDown(Vector2 touch)
-{
+    // Replace panel tiles with placed letters in puzzle words.
+    public void Refresh()
+    {
+        foreach (LibrettoTile tile in wordGrid.tiles)
+        {
+            if (tile.tileType == LibrettoTile.TILE_TYPE.PLACED)
+            {
+                tile.ShowGap();
+
+            }
+        }
+
+        panelGrid.ClearTiles();
+        panelGrid.ShowRowChars(Utils.Scramble<char>(buttonChars));
+    }
+
+    public void HandleTouchDown(Vector2 touch)
+    {
         ClearSelection();
 
         touchPosition = Camera.main.ScreenToWorldPoint(touch);
@@ -148,7 +166,7 @@ public void HandleTouchDown(Vector2 touch)
         }
         else
         {
-            selectedTile = tile; 
+            selectedTile = tile;
         }
 
         if (selectedTile != null) selectedTile.Select(true);
@@ -248,13 +266,13 @@ public void HandleTouchDown(Vector2 touch)
 
     private void ClearErrors()
     {
-            foreach (var t in puzzleWord.wordTiles)
+        foreach (var t in puzzleWord.wordTiles)
+        {
+            if (t.tileType == LibrettoTile.TILE_TYPE.PLACED)
             {
-                if (t.tileType == LibrettoTile.TILE_TYPE.PLACED)
-                {
-                    t.ShowPlaced();
-                }
+                t.ShowPlaced();
             }
+        }
     }
 
 
@@ -266,26 +284,27 @@ public void HandleTouchDown(Vector2 touch)
         bool allCompleted = true;
         bool allWords = true;
 
-            if (!puzzleWord.IsCompleted())
+        if (!puzzleWord.IsCompleted())
+        {
+            allCompleted = false;
+        }
+        else
+        {
+            if (!puzzleWord.IsAWord())
             {
-                allCompleted = false;
+                allWords = false;
+                puzzleWord.ShowErrors();
             }
-            else
-            {
-                if (!puzzleWord.IsAWord())
-                {
-                    allWords = false;
-                    puzzleWord.ShowErrors();
-                }
-            }
-       
+        }
+
         if (allCompleted)
         {
             if (allWords)
             {
                 //SUCCESS
                 textLabel.gameObject.SetActive(true);
-                Utils.DelayAndCall(this, 2, () => {
+                Utils.DelayAndCall(this, 2, () =>
+                {
                     textLabel.gameObject.SetActive(false);
                     NewPuzzle();
                 });
