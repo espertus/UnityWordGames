@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System;
 using System.Collections;
+using UnityEngine.Assertions;
 
 public class TileChar : MonoBehaviour {
 
@@ -30,7 +31,8 @@ public class TileChar : MonoBehaviour {
 		charsGO [type].SetActive (false);
 
 		var index = Array.IndexOf (chars, c);
-	
+
+        Assert.AreNotEqual(-1, index);
 		charsGO [index].SetActive (true);
 
 		type = index;

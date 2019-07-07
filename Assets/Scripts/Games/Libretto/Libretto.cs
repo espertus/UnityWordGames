@@ -11,6 +11,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     public static int TOP_WORD_LENGTH = 7;
     public static int BOTTOM_WORD_LENGTH = 7;
     public static int TOP_WORD_ROW = 0;
+    private static int NUM_DISTRACTERS = 2;
 
     // Other game objects
     public LibrettoWordGrid wordGrid;
@@ -79,6 +80,10 @@ public class Libretto : MonoBehaviour, IInputHandler
         }
 
         // Add scrambled letters to panel.
+        for (int i = 0; i < NUM_DISTRACTERS; i++)
+        {
+            buttonChars.Add(LibrettoTileBag.GetLetter());
+        }
         buttonChars = Utils.Scramble<char>(buttonChars);
         Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
         panelGrid.ShowRowChars(buttonChars);

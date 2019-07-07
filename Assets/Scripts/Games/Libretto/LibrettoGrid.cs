@@ -84,7 +84,6 @@ public abstract class LibrettoGrid : MonoBehaviour {
                 var item = Instantiate (gridTileGO) as GameObject;
 
                 var tile = item.GetComponent<LibrettoTile>();
-                Assert.IsNotNull(tile);
                 tile.SetTilePosition(row, column);
                 tile.transform.parent = gameObject.transform;
                 tile.gridType = gridType;
@@ -127,7 +126,6 @@ public abstract class LibrettoGrid : MonoBehaviour {
         gridTileSize *= scale;
         var x = (gridWidth * scale) * -0.5f;
         var y = (3.5f - 0.5f * (gridHeight * scale)) + offsetY;
-        Debug.Log("localPosition = (" + x + ", " + y + ")");
         transform.localPosition = new Vector2 ((gridWidth * scale) * -0.5f , (3.5f - 0.5f * (gridHeight * scale))  + offsetY);
     }
 

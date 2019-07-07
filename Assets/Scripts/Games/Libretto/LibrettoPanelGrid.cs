@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.Assertions;
 
 public class LibrettoPanelGrid : LibrettoGrid
 {
@@ -12,6 +13,7 @@ public class LibrettoPanelGrid : LibrettoGrid
     // Show the given characters (missing letters) on the tiles for this panel grid.
     public void ShowRowChars(List<char> chars)
     {
+        Assert.IsTrue(chars.Count < tiles.Count);
         var i = 0;
         foreach (var t in tiles)
         {
