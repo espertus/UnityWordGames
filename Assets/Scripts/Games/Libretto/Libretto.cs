@@ -14,6 +14,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     private static int NUM_DISTRACTERS = 2;
     private static int MAX_ABOVE_LETTERS = 2;
     private static int MAX_BELOW_LETTERS = 2;
+    public static bool TAP_ENABLED = true;
 
     // Other game objects
     public LibrettoWordGrid wordGrid;
@@ -89,7 +90,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             buttonChars.Add(LibrettoTileBag.GetLetter());
         }
         buttonChars = Utils.Scramble<char>(buttonChars);
-        Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
+        //Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
         panelGrid.ShowRowChars(buttonChars);
     }
 
@@ -140,6 +141,7 @@ public class Libretto : MonoBehaviour, IInputHandler
 
     public void HandleTouchDown(Vector2 touch)
     {
+        Debug.Log("Entering HandleTouchDown");
         ClearSelection();
 
         touchPosition = Camera.main.ScreenToWorldPoint(touch);
@@ -163,6 +165,7 @@ public class Libretto : MonoBehaviour, IInputHandler
                 selectedTile = tempTile.GetComponent<LibrettoTile>();
                 selectedTile.transform.localScale = panelGrid.transform.localScale;
                 selectedTile.transform.parent = wordGrid.transform;
+                Debug.Log("In HandleTouchDown(), changing transform.localPosition for " + selectedTile + " from " + selectedTile.transform.localPosition + " to " + tile.transform.localPosition);
                 selectedTile.transform.localPosition = tile.transform.localPosition;
                 selectedTile.gridType = LibrettoGrid.GRID_TYPE.WORD_GRID;
                 selectedTile.SetTileData(tile.TypeChar);
@@ -185,15 +188,50 @@ public class Libretto : MonoBehaviour, IInputHandler
 
     public void HandleTouchUp(Vector2 touch)
     {
+        Debug.Log("Entering HandleTouchUp");
         if (selectedTile == null)
         {
             return;
         }
 
+        // Is it a tap?
+        if (TAP_ENABLED)
+        {
+            var targetTile = panelGrid.TileCloseToPoint(touchPosition);
+            if (selectedTile == targetTile)
+            {
+                // A tap was detected.
+                if (selectedTile.gridType == LibrettoGrid.GRID_TYPE.PANEL_GRID)
+                {
+                    // Place the tapped tile in the highest gap.
+                    foreach (LibrettoTile tile in puzzleWord.wordTiles)
+                    {
+                        // Drop the tapped tile into the first gap (left to right, top to bottom)
+                        if (tile.tileType == LibrettoTile.TILE_TYPE.GAP)
+                        {
+                            // TODO: Refactor
+                            tile.SetTileData(selectedTile.TypeChar);
+                            tile.ShowPlaced();
+                            selectedTile.ResetPosition();
+                            selectedTile.gameObject.SetActive(false);
 
+                            CheckSolution();
+                            ClearSelection();
+                            return;
+                        }
+                        // Fall through if no gaps left.
+                    }
+
+                }
+                // Either a tap failed due to no gap or the tapped tile wasn't in the panel.
+                ClearSelection();
+                return;
+            }
+        }
+
+        // Check if moving from the word grid...
         if (selectedTile.tileType == LibrettoTile.TILE_TYPE.TEMPORARY)
         {
-
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
             if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
@@ -202,6 +240,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             }
             else
             {
+
                 target = panelGrid.TileCloseToPoint(touchPosition, false);
                 if (target != null && !target.gameObject.activeSelf)
                 {
@@ -217,6 +256,8 @@ public class Libretto : MonoBehaviour, IInputHandler
             Destroy(selectedTile.gameObject);
 
         }
+
+        // Check if moving from the panel grid...
         else if (selectedTile.gridType == LibrettoGrid.GRID_TYPE.PANEL_GRID)
         {
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
@@ -254,6 +295,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         ClearSelection();
 
     }
+
 
     public void HandleTouchMove(Vector2 touch)
     {
@@ -327,6 +369,8 @@ public class Libretto : MonoBehaviour, IInputHandler
     {
         if (selectedTile != null)
         {
+
+            Debug.Log("In Update(), changing transform.position for " + selectedTile + " from " + selectedTile.transform.position + " to " + touchPosition);
             selectedTile.transform.position = touchPosition;
         }
     }
@@ -374,8 +418,8 @@ public class Libretto : MonoBehaviour, IInputHandler
                 }
             }
             return false;
-            */           
-     
+            */
+
             foreach (var t in wordTiles)
             {
                 if (!t.gameObject.activeSelf)
@@ -385,6 +429,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             }
             return true;
         }
+
 
         public bool IsAWord()
         {
@@ -413,6 +458,4 @@ public class Libretto : MonoBehaviour, IInputHandler
         }
 
     }
-
 }
-

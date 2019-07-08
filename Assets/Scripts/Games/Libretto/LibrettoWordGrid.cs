@@ -19,7 +19,7 @@ public class LibrettoWordGrid : LibrettoGrid
     public List<LibrettoTile> GetRowTiles(int len, int row, int offset)
     {
         var result = new List<LibrettoTile>();
-        Debug.Log("In GetRowTiles(" + len + ", " + row + ", " + offset + "), columns = " + columns);
+        // Debug.Log("In GetRowTiles(" + len + ", " + row + ", " + offset + "), columns = " + columns);
         Assert.IsTrue(len + offset <= columns);
         Assert.IsTrue(row < rows);
         Assert.AreEqual(columns, gridTiles[row].Count);

@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class LibrettoTile : GridTile
 {
-
     public enum TILE_TYPE
     {
         EMPTY,      // for invisible tiles
@@ -33,16 +32,14 @@ public class LibrettoTile : GridTile
         localPosition = transform.localPosition;
     }
 
+    public override string ToString()
+    {
+        return "[LiberttoTile '" + this.TypeChar + "' at (" + this.column + ", " + this.row + ")]";
+    }
 
     public bool IsMovable()
     {
-
-        if (tileType == TILE_TYPE.PLACED)
-            return true;
-        if (tileType == TILE_TYPE.BUTTON)
-            return true;
-
-        return false;
+        return tileType == TILE_TYPE.PLACED || tileType == TILE_TYPE.BUTTON;
     }
 
     public void ShowTemporary()
@@ -107,6 +104,7 @@ public class LibrettoTile : GridTile
 
     public void ResetPosition()
     {
+        Debug.Log("In ResetPosition(), changing transform.localPosition for " + this + " from " + transform.localPosition + " to " + localPosition);
         transform.localPosition = localPosition;
     }
 

@@ -48,6 +48,8 @@ public abstract class LibrettoGrid : MonoBehaviour {
 
         if (r >= rows) return null;
 
+        //Debug.Log("In TileCloseToPoint(), r = " + r + ", c = " + c);
+
         if (gridTiles.Count <= r)
             return null;
 
@@ -57,6 +59,7 @@ public abstract class LibrettoGrid : MonoBehaviour {
         if (!gridTiles [r] [c].touched && mustTouch)
             return null;
 
+        Debug.Log("About to return " + gridTiles[r][c]);
         return gridTiles[r][c]; 
 
     }
