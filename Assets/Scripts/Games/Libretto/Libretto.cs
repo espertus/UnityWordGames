@@ -25,6 +25,10 @@ public class Libretto : MonoBehaviour, IInputHandler
     private Vector3 touchPosition;
     private LibrettoTile selectedTile;
     private LibrettoTile tempTileOrigin;
+    // The following variable enables detection of when a tile is selected
+    // from the panel, moved around, and returned. It should not be counted
+    // as a tap.
+    private bool leftArea;
 
     // State for this round
     private string mysteryWord;
@@ -99,11 +103,11 @@ public class Libretto : MonoBehaviour, IInputHandler
         mysteryWord = LibrettoDictionary.Instance.getRandomWord(MYSTERY_WORD_LENGTH);
         Assert.IsNotNull(mysteryWord);
         UnityEngine.Debug.Log("mysteryWord: " + mysteryWord);
-        topWordRow = UnityEngine.Random.Range(0, MAX_ABOVE_LETTERS + 1);
+        topWordRow = UnityEngine.Random.Range(0, MAX_ABOVE_LETTERS);
         topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[topWordRow], 0);
         topIntercept = topWord.IndexOf(mysteryWord[topWordRow]);
         UnityEngine.Debug.Log("topWord: " + topWord);
-        bottomWordRow = mysteryWord.Length - topWordRow - UnityEngine.Random.Range(0, MAX_BELOW_LETTERS + 1) - 1;
+        bottomWordRow = mysteryWord.Length - UnityEngine.Random.Range(0, MAX_BELOW_LETTERS) - 1;
         bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[bottomWordRow], 0);
         bottomIntercept = bottomWord.IndexOf(mysteryWord[bottomWordRow]);
         UnityEngine.Debug.Log("bottomWord: " + bottomWord);
@@ -198,7 +202,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         if (TAP_ENABLED)
         {
             var targetTile = panelGrid.TileCloseToPoint(touchPosition);
-            if (selectedTile == targetTile)
+            if (selectedTile == targetTile && !leftArea)
             {
                 // A tap was detected.
                 if (selectedTile.gridType == LibrettoGrid.GRID_TYPE.PANEL_GRID)
@@ -310,6 +314,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         {
             selectedTile.selected = false;
             selectedTile = null;
+            leftArea = false;
         }
     }
 
@@ -369,7 +374,11 @@ public class Libretto : MonoBehaviour, IInputHandler
     {
         if (selectedTile != null)
         {
-
+            if (TAP_ENABLED && panelGrid.TileCloseToPoint(touchPosition) != selectedTile)
+            {
+                leftArea = true;
+                Debug.Log("Setting leftArea to true.");
+            }
             Debug.Log("In Update(), changing transform.position for " + selectedTile + " from " + selectedTile.transform.position + " to " + touchPosition);
             selectedTile.transform.position = touchPosition;
         }
