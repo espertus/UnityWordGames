@@ -200,7 +200,6 @@ public class Libretto : MonoBehaviour, IInputHandler
 
         if (tile == null || !tile.gameObject.activeSelf)
         {
-
             //check word grid
             tile = wordGrid.TileCloseToPoint(touchPosition);
             if (tile != null && tile.gameObject.activeSelf && tile.IsMovable())
@@ -276,6 +275,7 @@ public class Libretto : MonoBehaviour, IInputHandler
         if (selectedTile.tileType == LibrettoTile.TILE_TYPE.TEMPORARY)
         {
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
+            // ...to gap in word grid.
             if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
                 target.SetTileData(selectedTile.TypeChar);
@@ -283,12 +283,13 @@ public class Libretto : MonoBehaviour, IInputHandler
             }
             else
             {
-
                 target = panelGrid.TileCloseToPoint(touchPosition, false);
+                // back to panel grid.
                 if (target != null && !target.gameObject.activeSelf)
                 {
                     target.SetTileData(selectedTile.TypeChar);
                     target.ShowButton();
+                    target.Select(true);
                 }
                 else
                 {
@@ -305,8 +306,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             var target = wordGrid.TileCloseToPoint(touchPosition, false);
             if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
-                target.SetTileData(selectedTile.TypeChar);
-                target.ShowPlaced();
+                target.Place(selectedTile.TypeChar);
                 selectedTile.HideInPanel();
             }
             else
