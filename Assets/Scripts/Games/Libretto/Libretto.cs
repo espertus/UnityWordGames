@@ -160,8 +160,7 @@ public class Libretto : MonoBehaviour, IInputHandler
                 if (tile.TypeChar == distractor)
                 {
                     // Remove from tile panel.
-                    Debug.Log("Distractor tile found: " + tile);
-                    //panelGrid.tiles.Remove(tile); Not sure if needed
+                    panelGrid.tiles.Remove(tile); // remove so it won't be used later for hint
                     buttonChars.Remove(distractor); // so it won't reappear on reset
                     bool placed = !tile.IsActive();
                     tile.ShowEmpty();
@@ -171,7 +170,6 @@ public class Libretto : MonoBehaviour, IInputHandler
                     {
                         foreach (LibrettoTile wordTile in puzzleWord.wordTiles)
                         {
-                            Debug.Log("wordTile: " + wordTile);
                             if (wordTile.TypeChar == distractor &&
                             wordTile.tileType == LibrettoTile.TILE_TYPE.PLACED)
                             {
@@ -185,6 +183,33 @@ public class Libretto : MonoBehaviour, IInputHandler
                 }
             }
             Assert.IsTrue(false); // The tile was not found in panel
+        }
+        
+        // If no distractors are available and there is a gap, fill it in.
+        int i = 0;
+        foreach (LibrettoTile wordTile in puzzleWord.wordTiles)
+        {
+            if (wordTile.tileType == LibrettoTile.TILE_TYPE.GAP)
+            {
+                char c = puzzleWord.word[i];
+                foreach (LibrettoTile panelTile in panelGrid.tiles)
+                {
+                    if (panelTile.TypeChar == c)
+                    {
+                        // Also make sure this works with dead distractor tiles.
+                        if (panelTile.IsActive())
+                        {
+                            wordTile.Place(c);
+                            panelTile.HideInPanel();
+                            CheckSolution();
+                            return;
+                        }
+                        // We can't use this panel tile, since it's already been played, but
+                        // maybe there's another panel tile with the same letter, so keep looking.
+                    }
+                }
+            }
+            i++;
         }
     }
 
@@ -278,8 +303,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             // ...to gap in word grid.
             if (target != null && target.gameObject.activeSelf && target.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
-                target.SetTileData(selectedTile.TypeChar);
-                target.ShowPlaced();
+                target.Place(selectedTile.TypeChar);
             }
             else
             {
@@ -328,7 +352,6 @@ public class Libretto : MonoBehaviour, IInputHandler
             {
                 selectedTile.ResetPosition();
             }
-
         }
 
         CheckSolution();
