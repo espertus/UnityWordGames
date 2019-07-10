@@ -59,7 +59,6 @@ public abstract class LibrettoGrid : MonoBehaviour {
         if (!gridTiles [r] [c].touched && mustTouch)
             return null;
 
-        Debug.Log("About to return " + gridTiles[r][c]);
         return gridTiles[r][c]; 
 
     }

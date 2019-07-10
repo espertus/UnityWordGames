@@ -40,6 +40,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     private List<char> buttonChars;
     private int topWordRow;
     private int bottomWordRow;
+    private List<char> distractorChars;
 
     void Start()
     {
@@ -88,13 +89,17 @@ public class Libretto : MonoBehaviour, IInputHandler
             }
         }
 
-        // Add scrambled letters to panel.
+        // Set up distractors.
+        distractorChars = new List<char>();
         for (int i = 0; i < NUM_DISTRACTERS; i++)
         {
-            buttonChars.Add(LibrettoTileBag.GetLetter());
+            char distractor = LibrettoTileBag.GetLetter();
+            distractorChars.Add(distractor);
+            buttonChars.Add(distractor);
         }
+        Debug.Log("distractorChars: " + new string(distractorChars.ToArray()));
         buttonChars = Utils.Scramble<char>(buttonChars);
-        //Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
+        Debug.Log("buttonChars: " + new string(buttonChars.ToArray()));
         panelGrid.ShowRowChars(buttonChars);
     }
 
@@ -106,11 +111,9 @@ public class Libretto : MonoBehaviour, IInputHandler
         topWordRow = UnityEngine.Random.Range(0, MAX_ABOVE_LETTERS);
         topWord = LibrettoDictionary.Instance.getRandomWord(TOP_WORD_LENGTH, mysteryWord[topWordRow], 0);
         topIntercept = topWord.IndexOf(mysteryWord[topWordRow]);
-        UnityEngine.Debug.Log("topWord: " + topWord);
         bottomWordRow = mysteryWord.Length - UnityEngine.Random.Range(0, MAX_BELOW_LETTERS) - 1;
         bottomWord = LibrettoDictionary.Instance.getRandomWord(BOTTOM_WORD_LENGTH, mysteryWord[bottomWordRow], 0);
         bottomIntercept = bottomWord.IndexOf(mysteryWord[bottomWordRow]);
-        UnityEngine.Debug.Log("bottomWord: " + bottomWord);
     }
 
     void PlaceWord(string word, int row, int offset)
@@ -143,9 +146,54 @@ public class Libretto : MonoBehaviour, IInputHandler
         panelGrid.ShowRowChars(Utils.Scramble<char>(buttonChars));
     }
 
+    public void GiveHint()
+    {
+        // First, remove a distractor if any remain.
+        if (distractorChars.Count > 0)
+        {
+            char distractor = distractorChars[0];
+            distractorChars.RemoveAt(0);
+
+            //  This removes a tile with the distracting letter from the panel
+            // but not from the word grid if it has been placed.
+            foreach (LibrettoTile tile in panelGrid.tiles)
+            {
+                if (tile.TypeChar == distractor)
+                {
+                    // Remove from tile panel.
+                    Debug.Log("Distractor tile found: " + tile);
+                    //panelGrid.tiles.Remove(tile); Not sure if needed
+                    buttonChars.Remove(distractor); // so it won't reappear on reset
+                    tile.tileType = LibrettoTile.TILE_TYPE.EMPTY;
+                    bool placed = !tile.gameObject.activeSelf;
+                    tile.gameObject.SetActive(false);
+
+                    // Remove from word grid if placed there.
+                    if (placed)
+                    {
+                        foreach (LibrettoTile wordTile in puzzleWord.wordTiles)
+                        {
+                            Debug.Log("wordTile: " + wordTile);
+                            if (wordTile.TypeChar == distractor &&
+                            wordTile.tileType == LibrettoTile.TILE_TYPE.PLACED)
+                            {
+                                wordTile.tileType = LibrettoTile.TILE_TYPE.GAP;
+                                wordTile.gameObject.SetActive(false);
+                                wordTile.ShowGap();
+                                return;
+                            }
+                        }
+                        Assert.IsTrue(false);
+                    }
+                    return;
+                }
+            }
+            Assert.IsTrue(false); // The tile was not found in panel
+        }
+    }
+
     public void HandleTouchDown(Vector2 touch)
     {
-        Debug.Log("Entering HandleTouchDown");
         ClearSelection();
 
         touchPosition = Camera.main.ScreenToWorldPoint(touch);
@@ -153,7 +201,6 @@ public class Libretto : MonoBehaviour, IInputHandler
 
         //check panel grid
         var tile = panelGrid.TileCloseToPoint(touchPosition);
-
 
         if (tile == null || !tile.gameObject.activeSelf)
         {
@@ -169,7 +216,7 @@ public class Libretto : MonoBehaviour, IInputHandler
                 selectedTile = tempTile.GetComponent<LibrettoTile>();
                 selectedTile.transform.localScale = panelGrid.transform.localScale;
                 selectedTile.transform.parent = wordGrid.transform;
-                Debug.Log("In HandleTouchDown(), changing transform.localPosition for " + selectedTile + " from " + selectedTile.transform.localPosition + " to " + tile.transform.localPosition);
+       
                 selectedTile.transform.localPosition = tile.transform.localPosition;
                 selectedTile.gridType = LibrettoGrid.GRID_TYPE.WORD_GRID;
                 selectedTile.SetTileData(tile.TypeChar);
@@ -192,7 +239,6 @@ public class Libretto : MonoBehaviour, IInputHandler
 
     public void HandleTouchUp(Vector2 touch)
     {
-        Debug.Log("Entering HandleTouchUp");
         if (selectedTile == null)
         {
             return;
@@ -377,9 +423,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             if (TAP_ENABLED && panelGrid.TileCloseToPoint(touchPosition) != selectedTile)
             {
                 leftArea = true;
-                Debug.Log("Setting leftArea to true.");
             }
-            Debug.Log("In Update(), changing transform.position for " + selectedTile + " from " + selectedTile.transform.position + " to " + touchPosition);
             selectedTile.transform.position = touchPosition;
         }
     }

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class LibrettoTile : GridTile
 {
@@ -34,7 +32,7 @@ public class LibrettoTile : GridTile
 
     public override string ToString()
     {
-        return "[LiberttoTile '" + this.TypeChar + "' at (" + this.column + ", " + this.row + ")]";
+        return "[LibrettoTile '" + TypeChar + "' at (" + column + ", " + row + "), active: " + gameObject.activeSelf + "]";
     }
 
     public bool IsMovable()
