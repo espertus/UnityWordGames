@@ -185,13 +185,33 @@ public class Libretto : MonoBehaviour, IInputHandler
             Assert.IsTrue(false); // The tile was not found in panel
         }
         
-        // If no distractors are available and there is a gap, fill it in.
-        int i = 0;
+        // If no distractors are available, show any misplaced letters.
+        if (puzzleWord.Has(LibrettoTile.TILE_TYPE.PLACED))
+        {
+            bool foundWrong = false;
+            for (var i = 0; i < puzzleWord.word.Length; i++)
+            {
+                LibrettoTile wordTile = puzzleWord.wordTiles[i];
+                if (wordTile.tileType == LibrettoTile.TILE_TYPE.PLACED && wordTile.TypeChar != puzzleWord.word[i])
+                {
+                    wordTile.ShowWrong();
+                    foundWrong = true;
+                }
+            }
+
+            if (foundWrong)
+            {
+                return;
+            }
+        }
+
+        // fill in a letter from the panel.
+        var index = 0;
         foreach (LibrettoTile wordTile in puzzleWord.wordTiles)
         {
             if (wordTile.tileType == LibrettoTile.TILE_TYPE.GAP)
             {
-                char c = puzzleWord.word[i];
+                char c = puzzleWord.word[index];
                 foreach (LibrettoTile panelTile in panelGrid.tiles)
                 {
                     if (panelTile.TypeChar == c)
@@ -209,7 +229,7 @@ public class Libretto : MonoBehaviour, IInputHandler
                     }
                 }
             }
-            i++;
+            index++;
         }
     }
 
@@ -515,14 +535,27 @@ public class Libretto : MonoBehaviour, IInputHandler
             return false;
         }
 
+        /// <summary>
+        /// Color all of the placed tiles in the word (even correctly placed ones) to indicate error.
+        /// </summary>
         public void ShowErrors()
         {
             foreach (var t in wordTiles)
             {
-
                 t.ShowWrong();
             }
         }
 
+        public bool Has(LibrettoTile.TILE_TYPE tileType)
+        {
+            foreach (LibrettoTile tile in wordTiles)
+            {
+                if (tile.tileType == tileType)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }
