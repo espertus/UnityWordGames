@@ -126,7 +126,6 @@ public class Libretto : MonoBehaviour, IInputHandler
             LibrettoTile tile = wordTiles[i];
             tile.SetTileData(chars[i]);
             tile.ShowFixed();
-            tile.SetColor(Color.white, Color.black);
         }
     }
 
@@ -164,9 +163,8 @@ public class Libretto : MonoBehaviour, IInputHandler
                     Debug.Log("Distractor tile found: " + tile);
                     //panelGrid.tiles.Remove(tile); Not sure if needed
                     buttonChars.Remove(distractor); // so it won't reappear on reset
-                    tile.tileType = LibrettoTile.TILE_TYPE.EMPTY;
-                    bool placed = !tile.gameObject.activeSelf;
-                    tile.gameObject.SetActive(false);
+                    bool placed = !tile.IsActive();
+                    tile.ShowEmpty();
 
                     // Remove from word grid if placed there.
                     if (placed)
@@ -177,8 +175,6 @@ public class Libretto : MonoBehaviour, IInputHandler
                             if (wordTile.TypeChar == distractor &&
                             wordTile.tileType == LibrettoTile.TILE_TYPE.PLACED)
                             {
-                                wordTile.tileType = LibrettoTile.TILE_TYPE.GAP;
-                                wordTile.gameObject.SetActive(false);
                                 wordTile.ShowGap();
                                 return;
                             }
@@ -259,11 +255,8 @@ public class Libretto : MonoBehaviour, IInputHandler
                         // Drop the tapped tile into the first gap (left to right, top to bottom)
                         if (tile.tileType == LibrettoTile.TILE_TYPE.GAP)
                         {
-                            // TODO: Refactor
-                            tile.SetTileData(selectedTile.TypeChar);
-                            tile.ShowPlaced();
-                            selectedTile.ResetPosition();
-                            selectedTile.gameObject.SetActive(false);
+                            tile.Place(selectedTile.TypeChar);
+                            selectedTile.HideInPanel();
 
                             CheckSolution();
                             ClearSelection();
@@ -299,8 +292,7 @@ public class Libretto : MonoBehaviour, IInputHandler
                 }
                 else
                 {
-                    tempTileOrigin.SetTileData(selectedTile.TypeChar);
-                    tempTileOrigin.ShowPlaced();
+                    tempTileOrigin.Place(selectedTile.TypeChar);
                 }
             }
             Destroy(selectedTile.gameObject);
@@ -315,8 +307,7 @@ public class Libretto : MonoBehaviour, IInputHandler
             {
                 target.SetTileData(selectedTile.TypeChar);
                 target.ShowPlaced();
-                selectedTile.ResetPosition();
-                selectedTile.gameObject.SetActive(false);
+                selectedTile.HideInPanel();
             }
             else
             {

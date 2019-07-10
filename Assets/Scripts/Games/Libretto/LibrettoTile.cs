@@ -37,6 +37,11 @@ public class LibrettoTile : GridTile
         return tileType == TILE_TYPE.PLACED || tileType == TILE_TYPE.BUTTON;
     }
 
+    public bool IsActive()
+    {
+        return gameObject.activeSelf;
+    }
+    
     public void ShowTemporary()
     {
         gameObject.SetActive(true);
@@ -48,12 +53,12 @@ public class LibrettoTile : GridTile
 
     public void ShowGap()
     {
-        gameObject.SetActive(true);
+        gameObject.SetActive(true); // Why not false?
         outline.gameObject.SetActive(true);
         tileBg.SetActive(false);
         foreach (var c in charsGO)
             c.SetActive(false);
-        outline.color = Color.blue;
+        outline.color = LibrettoPalette.GAP_BG_COLOR;
         tileType = TILE_TYPE.GAP;
     }
 
@@ -66,6 +71,21 @@ public class LibrettoTile : GridTile
         tileType = TILE_TYPE.CLUE;
     }
 
+    // This is not fully tested and probably doesn't work in all cases.
+    public void ShowEmpty()
+    {
+        gameObject.SetActive(false);
+        outline.gameObject.SetActive(false);
+        tileBg.SetActive(false);
+        tileType = LibrettoTile.TILE_TYPE.EMPTY;
+    }
+
+    public void Place(char c)
+    {
+        SetTileData(c);
+        ShowPlaced();
+    }
+    
     public void ShowPlaced()
     {
         gameObject.SetActive(true);
@@ -87,7 +107,6 @@ public class LibrettoTile : GridTile
 
     public void ShowWrong()
     {
-
         if (tileType != TILE_TYPE.PLACED)
             return;
 
@@ -97,6 +116,13 @@ public class LibrettoTile : GridTile
         SetColor(LibrettoPalette.WRONG_BG_COLOR, LibrettoPalette.WRONG_FG_COLOR);
     }
 
+    // call this when a letter is moved from the panel (the tile still remains but hides)
+    public void HideInPanel()
+    {
+        ResetPosition();
+        gameObject.SetActive(false);
+    }
+    
     public void ResetPosition()
     {
         //Debug.Log("In ResetPosition(), changing transform.localPosition for " + this + " from " + transform.localPosition + " to " + localPosition);
