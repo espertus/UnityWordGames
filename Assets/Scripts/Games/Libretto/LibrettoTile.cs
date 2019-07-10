@@ -20,9 +20,6 @@ public class LibrettoTile : GridTile
     [HideInInspector]
     public TILE_TYPE tileType;
 
-    public Color wrongColor = Color.red;
-    public Color placedColor = Color.white;
-    public Color gapColor = Color.blue;
     private Vector2 localPosition;
 
     void Start()
@@ -45,7 +42,7 @@ public class LibrettoTile : GridTile
         gameObject.SetActive(true);
         outline.gameObject.SetActive(false);
         tileBg.SetActive(true);
-        SetColor(gapColor, Color.white);
+        SetColor(LibrettoPalette.GAP_BG_COLOR, LibrettoPalette.GAP_FG_COLOR);
         tileType = TILE_TYPE.TEMPORARY;
     }
 
@@ -65,7 +62,7 @@ public class LibrettoTile : GridTile
         gameObject.SetActive(true);
         outline.gameObject.SetActive(false);
         tileBg.SetActive(true);
-        SetColor(placedColor, Color.black);
+        SetColor(LibrettoPalette.FIXED_BG_COLOR, LibrettoPalette.FIXED_FG_COLOR);
         tileType = TILE_TYPE.CLUE;
     }
 
@@ -74,7 +71,7 @@ public class LibrettoTile : GridTile
         gameObject.SetActive(true);
         outline.gameObject.SetActive(false);
         tileBg.SetActive(true);
-        SetColor(gapColor, Color.white);
+        SetColor(LibrettoPalette.PLACED_BG_COLOR, LibrettoPalette.PLACED_FG_COLOR);
         tileType = TILE_TYPE.PLACED;
     }
 
@@ -83,7 +80,7 @@ public class LibrettoTile : GridTile
         gameObject.SetActive(true);
         outline.gameObject.SetActive(false);
         tileBg.SetActive(true);
-        SetColor(gapColor, Color.white);
+        SetColor(LibrettoPalette.GAP_BG_COLOR, LibrettoPalette.GAP_FG_COLOR);
         tileType = TILE_TYPE.BUTTON;
     }
 
@@ -97,12 +94,12 @@ public class LibrettoTile : GridTile
         gameObject.SetActive(true);
         outline.gameObject.SetActive(false);
         tileBg.SetActive(true);
-        SetColor(wrongColor, Color.white);
+        SetColor(LibrettoPalette.WRONG_BG_COLOR, LibrettoPalette.WRONG_FG_COLOR);
     }
 
     public void ResetPosition()
     {
-        Debug.Log("In ResetPosition(), changing transform.localPosition for " + this + " from " + transform.localPosition + " to " + localPosition);
+        //Debug.Log("In ResetPosition(), changing transform.localPosition for " + this + " from " + transform.localPosition + " to " + localPosition);
         transform.localPosition = localPosition;
     }
 

@@ -92,6 +92,7 @@
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoDictionary.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoGameEvents.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoGrid.cs" />
+    <Compile Include="Assets\Scripts\Games\Libretto\LibrettoPalette.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoPanelGrid.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoTile.cs" />
     <Compile Include="Assets\Scripts\Games\Libretto\LibrettoTileBag.cs" />
