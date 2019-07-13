@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -233,6 +234,21 @@ public class Libretto : MonoBehaviour, IInputHandler
         }
     }
 
+    public void CheckWord()
+    {
+        string word = puzzleWord.GetCompletedWord();
+        if (word != null)
+        {
+            if (LibrettoDictionary.Instance.IsValidWord(word))
+            {
+                CheckSolution(); // TODO: Make sure CheckSolution doesn't get called twice.
+            }
+            else
+            {
+                puzzleWord.ShowErrors();
+            }
+        }
+    }
     public void HandleTouchDown(Vector2 touch)
     {
         ClearSelection();
@@ -411,8 +427,7 @@ public class Libretto : MonoBehaviour, IInputHandler
     }
 
 
-
-    private void CheckSolution()
+    public void CheckSolution()
     {
         ClearErrors();
 
@@ -474,65 +489,86 @@ public class Libretto : MonoBehaviour, IInputHandler
             this.word = word;
             this.wordTiles = tiles;
         }
-
-        // This assumes there are exactly 2 CLUE tiles in each word.
-        public bool IsCompleted()
+        
+        /// <summary>
+        /// Checks if a word has been completed, i.e., whether all of clue/placed
+        /// tiles are contiguous. This assumes there are exactly 2 clue tiles.
+        /// </summary>
+        /// <returns>the word, or null if a word has not been completed</returns>
+        /// <exception cref="Exception">if an invariant is violated</exception>
+        public string GetCompletedWord()
         {
-            /*
             int BEFORE = 0;
-            int WITHIN = 1;
-            int AFTER = 2;
+            int AFTER_1ST_PLACEMENT = 1;
+            int AFTER_1ST_CLUE = 2;
+            int AFTER_2ND_CLUE = 3;
+            int AFTER_GAP = 4;
             int state = BEFORE;
+            List<char> word = new List<char>();
 
             foreach (var t in wordTiles)
             {
-                if (!t.gameObject.activeSelf)
-                {
-                    return false;
-                }
                 switch(t.tileType)
                 {
                     case LibrettoTile.TILE_TYPE.GAP:
-                        return state == AFTER;
+                        if (state == AFTER_1ST_PLACEMENT || state == AFTER_1ST_CLUE)
+                        {
+                            return null; // non-contiguous word
+                        }
+                        else if (state == AFTER_2ND_CLUE) {
+                            state = AFTER_GAP;
+                        }
+                        break;
                     case LibrettoTile.TILE_TYPE.CLUE:
-                        state++;
+                        word.Add(t.TypeChar);
+                        if (state == BEFORE || state == AFTER_1ST_PLACEMENT)
+                        {
+                            state = AFTER_1ST_CLUE;
+                        } else if (state == AFTER_1ST_CLUE)
+                        {
+                            state = AFTER_2ND_CLUE;
+                        }
+                        else
+                        {
+                            throw new Exception("More than 2 clue tiles in word.");
+                        }
                         break;
                     case LibrettoTile.TILE_TYPE.PLACED:
+                        word.Add(t.TypeChar);
+                        if (state == BEFORE)
+                        {
+                            state = AFTER_1ST_PLACEMENT;
+                        } else if (state == AFTER_GAP)
+                        {
+                            return null;  // non-contiguous word
+                        }
                         break;
                     default:
-                        Assert.IsEqual(-1, t.tileType);
+                        throw new Exception("Unexpected tile type: " + t.tileType);
 
                 }
             }
-            return false;
-            */
 
-            foreach (var t in wordTiles)
-            {
-                if (!t.gameObject.activeSelf)
-                    return false;
-                if (t.tileType == LibrettoTile.TILE_TYPE.GAP)
-                    return false;
-            }
-            return true;
+            return string.Concat(word.ToArray());
         }
 
 
         public bool IsAWord()
         {
-            if (IsCompleted())
+            var word = GetCompletedWord();
+            if (word != null)
             {
-                char[] c = new char[wordTiles.Count];
-                var i = 0;
-                foreach (var t in wordTiles)
-                {
-                    c[i] = t.TypeChar;
-                    i++;
-                }
-                var newWord = new string(c);
-                return LibrettoDictionary.Instance.IsValidWord(newWord);
+                return LibrettoDictionary.Instance.IsValidWord(word);
             }
-            return false;
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool IsCompleted()
+        {
+            return GetCompletedWord() != null;
         }
 
         /// <summary>
